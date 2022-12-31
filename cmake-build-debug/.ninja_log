@@ -1,0 +1,5 @@
+# ninja log v5
+0	47	1672503786133307942	CMakeFiles/abcc.dir/Lexer.cpp.o	1967a6e57ca766ab
+0	48	1672503786133296262	CMakeFiles/abcc.dir/Parser.cpp.o	bd1018205f1fd0f9
+0	406	1672503786491253048	CMakeFiles/abcc.dir/main.cpp.o	6a83169a85b1022b
+408	462	1672503786548462043	abcc	caacdf3156565713
