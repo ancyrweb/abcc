@@ -16,10 +16,14 @@ private:
 	void preproc();
 	void preprocInclude();
 	void keywordOrIdentifier(const std::string name, TokenType tokenType);
-		
+	void stringLiteral();
+	void numberLiteral();
+	void identifier();
+
 	// Utils
 	void skipWhitespaces();
 	bool isAlpha(const char c);
+	bool isDigit(const char c);
 	bool isWhitespace(const char c);
 	char advance();
 	char peek();

@@ -25,7 +25,106 @@ void Lexer::scan(const std::string source) {
       case ']': { addToken(TokenType::RIGHT_BRACKET); break; }
       case ',': { addToken(TokenType::COMMA); break; }
       case '.': { addToken(TokenType::DOT); break; }
+      case '^': { addToken(TokenType::BITWISE_XOR); break; }
       case '\\': { addToken(TokenType::BACK_SLASH); break; }
+      case '+': {
+        if (peek() == '+') {
+          advance();
+          addToken(TokenType::INCREMENT);
+          break;
+        } else if (peek() == '=') {
+          advance();
+          addToken(TokenType::ASSIGN_PLUS_EQUAL);
+          break;
+        } 
+
+        addToken(TokenType::PLUS);
+        break;
+      }
+      case '-': {
+        if (peek() == '-') {
+          advance();
+          addToken(TokenType::DECREMENT);
+          break;
+        } else if (peek() == '=') {
+          advance();
+          addToken(TokenType::ASSIGN_MINUS_EQUAL);
+          break;
+        } 
+
+        addToken(TokenType::MINUS);
+        break;
+      }
+      case '*': {
+        if (peek() == '=') {
+          advance();
+          addToken(TokenType::ASSIGN_STAR_EQUAL);
+          break;
+        } 
+
+        addToken(TokenType::STAR);
+        break;
+      }
+      case '/': {
+        if (peek() == '=') {
+          advance();
+          addToken(TokenType::ASSIGN_SLASH_EQUAL);
+          break;
+        } 
+
+        addToken(TokenType::SLASH);
+        break;
+      }
+      case '%': {
+        if (peek() == '=') {
+          advance();
+          addToken(TokenType::ASSIGN_MODULO_EQUAL);
+          break;
+        } 
+
+        addToken(TokenType::ASSIGN);
+        break;
+      }
+      case '=': {
+        if (peek() == '=') {
+          advance();
+          addToken(TokenType::EQUAL_EQUAL);
+          break;
+        } 
+
+        addToken(TokenType::ASSIGN);
+        break;
+      }
+      case '!': {
+        if (peek() == '=') {
+          advance();
+          addToken(TokenType::BANG_EQUAL);
+          break;
+        } 
+
+        addToken(TokenType::BANG);
+        break;
+      }
+      case '&': {
+        if (peek() == '&') {
+          advance();
+          addToken(TokenType::LOGICAL_AND);
+          break;
+        } 
+
+        addToken(TokenType::BITWISE_AND);
+        break;
+      }
+      case '|': {
+        if (peek() == '|') {
+          advance();
+          addToken(TokenType::LOGICAL_OR);
+          break;
+        } 
+
+        addToken(TokenType::BITWISE_OR);
+        break;
+      }
       case '#': {
         preproc();
         break;
@@ -33,7 +132,50 @@ void Lexer::scan(const std::string source) {
       case '<': {
         if (isAlpha(peek())) {
           preprocInclude();
+          break;
+        } 
+
+        if (peek() == '=') {
+          advance();
+          addToken(TokenType::LOWER_EQUAL);
+          break;
+        } 
+        
+        if (peek() == '<') {
+          advance();
+          if (peekNext() == '=') {
+            advance();
+            addToken(TokenType::ASSIGN_BITWISE_SHIFT_LEFT);
+            break;
+          } 
+
+          addToken(TokenType::BITWISE_SHIFT_LEFT);
+          break;
         }
+      
+        addToken(TokenType::LOWER);
+        break;
+      }      
+      case '>': {
+        if (peek() == '=') {
+          advance();
+          addToken(TokenType::GREATER_EQUAL);
+          break;
+        } 
+        
+        if (peek() == '>') {
+          advance();
+          if (peekNext() == '=') {
+            advance();
+            addToken(TokenType::ASSIGN_BITWISE_SHIFT_RIGHT);
+            break;
+          } 
+
+          addToken(TokenType::BITWISE_SHIFT_RIGHT);
+          break;
+        }
+      
+        addToken(TokenType::GREATER);
         break;
       }
       case 'a': {
@@ -114,13 +256,25 @@ void Lexer::scan(const std::string source) {
         keywordOrIdentifier("while", TokenType::WHILE);
         break;
       }
+      case '"': {
+        stringLiteral();
+        break;
+      }
       default: {
+        if (isDigit(c)) {
+          numberLiteral();
+          break;
+        } else if (isAlpha(c)) {
+          identifier();
+          break;
+        }
+
         std::cout << "Unknown token " << c << "." << std::endl;
       }
     }
   }
 
-  debugTokens(_tokens);
+  // debugTokens(_tokens);
 }
 
 void Lexer::preproc() {
@@ -163,14 +317,59 @@ void Lexer::keywordOrIdentifier(const std::string name, TokenType tokenType) {
   if (_start + name.size() < _source.size()) {
     const char *sourceStart = _source.c_str() + _start;
     const char *targetStart = name.c_str();
-    std::cout << name << std::endl;
 
     if (memcmp(sourceStart, targetStart, name.size()) == 0) {
       _current += name.size() - 1;
       this->addToken(tokenType);
+      return;
     }
   }
 
+  return identifier();
+}
+
+void Lexer::stringLiteral() {
+  while(peek() != '"' && !isAtEnd()) {
+    advance();
+  }
+
+  if (isAtEnd()) {
+    reportError("Expected closing \" but reached end of file.");
+    return;
+  }
+
+  advance(); // consume closing "
+  this->addToken(TokenType::STRING);
+}
+
+void Lexer::numberLiteral() {
+  while(!isAtEnd() && isDigit(peek())) {
+    advance();
+  }
+
+  if (peek() == '.') {
+    while(!isAtEnd() && isDigit(peek())) {
+      advance();
+    }
+
+    this->addToken(TokenType::DECIMAL);
+    return;
+  }
+
+  this->addToken(TokenType::INTEGER);
+}
+
+void Lexer::identifier() {
+  while (!isAtEnd() && (isAlpha(peek()) || peek() == '_')) {
+    advance();
+  }
+
+  if (isAtEnd()) {
+    reportError("Expected ; at end of file.");
+    return;
+  }
+
+  this->addToken(TokenType::IDENTIFIER);
 }
 
 // Utils
@@ -207,6 +406,10 @@ bool Lexer::isAlpha(const char c) {
   return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
 }
 
+bool Lexer::isDigit(const char c) {
+  return c >= '0' && c <= '9';
+}
+
 bool Lexer::isWhitespace(const char c) {
   return c == ' ' || c == '\t';
 }
@@ -237,7 +440,7 @@ void Lexer::addToken(TokenType type) {
 }
 
 bool Lexer::isAtEnd() {
-  return _current >= _source.size();
+  return _current >= _source.size() - 1;
 }
 
 void Lexer::reportError(std::string content) {

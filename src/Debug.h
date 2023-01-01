@@ -96,8 +96,8 @@ std::string tokenToString(TokenType t) {
 
 void debugTokens(std::vector<Token> tokens) {
   for (auto token: tokens) {
-    std::cout << "[" << tokenToString(token.getType()) << "]";
-    std::cout << "[" << token.getStart() << " - " << token.getEnd() << "] ";
+    std::cout << tokenToString(token.getType()) << " | ";
+    std::cout << token.getStart() << " - " << token.getEnd() << " | ";
     std::cout << token.getLexeme();
     std::cout << std::endl;
   }

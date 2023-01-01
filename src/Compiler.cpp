@@ -1,6 +1,7 @@
 #include "Compiler.h"
 #include "Lexer.h"
 
+#include <chrono>
 #include <iostream>
 #include <fstream>
 
@@ -24,5 +25,10 @@ void Compiler::readFromFile(const std::string filePath) {
 
 void Compiler::run(const std::string source) {
   Lexer lexer;
+
+  auto start = std::chrono::high_resolution_clock::now();
   lexer.scan(source);
+  auto stop = std::chrono::high_resolution_clock::now();
+  auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
+  std::cout << "Time : " << duration.count() << std::endl;
 }
