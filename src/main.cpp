@@ -1,6 +1,8 @@
 #include <iostream>
+#include "Compiler.h"
 
 int main() {
-    std::cout << "Hello, World!" << std::endl;
+    Compiler compiler;
+    compiler.readFromFile("../main-test.c");
     return 0;
 }

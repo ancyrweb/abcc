@@ -1,0 +1,10 @@
+{
+  "editor.formatOnSave": false,
+  "files.associations": {
+    "*.ejs": "html",
+    "*.env.local": "env",
+    "iostream": "cpp",
+    "string": "cpp",
+    "istream": "cpp"
+  }
+}

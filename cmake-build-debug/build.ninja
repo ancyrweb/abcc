@@ -70,6 +70,12 @@ build CMakeFiles/abcc.dir/src/Compiler.cpp.o: CXX_COMPILER__abcc_Debug /Users/an
   OBJECT_DIR = CMakeFiles/abcc.dir
   OBJECT_FILE_DIR = CMakeFiles/abcc.dir/src
 
+build CMakeFiles/abcc.dir/src/Token.cpp.o: CXX_COMPILER__abcc_Debug /Users/anthonybenkhebbab/Documents/Dev/Projects/abcc/src/Token.cpp || cmake_object_order_depends_target_abcc
+  DEP_FILE = CMakeFiles/abcc.dir/src/Token.cpp.o.d
+  FLAGS = -g -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.1.sdk -fcolor-diagnostics -std=gnu++14
+  OBJECT_DIR = CMakeFiles/abcc.dir
+  OBJECT_FILE_DIR = CMakeFiles/abcc.dir/src
+
 
 # =============================================================================
 # Link build statements for EXECUTABLE target abcc
@@ -78,7 +84,7 @@ build CMakeFiles/abcc.dir/src/Compiler.cpp.o: CXX_COMPILER__abcc_Debug /Users/an
 #############################################
 # Link the executable abcc
 
-build abcc: CXX_EXECUTABLE_LINKER__abcc_Debug CMakeFiles/abcc.dir/src/main.cpp.o CMakeFiles/abcc.dir/src/Parser.cpp.o CMakeFiles/abcc.dir/src/Lexer.cpp.o CMakeFiles/abcc.dir/src/Compiler.cpp.o
+build abcc: CXX_EXECUTABLE_LINKER__abcc_Debug CMakeFiles/abcc.dir/src/main.cpp.o CMakeFiles/abcc.dir/src/Parser.cpp.o CMakeFiles/abcc.dir/src/Lexer.cpp.o CMakeFiles/abcc.dir/src/Compiler.cpp.o CMakeFiles/abcc.dir/src/Token.cpp.o
   FLAGS = -g -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.1.sdk
   OBJECT_DIR = CMakeFiles/abcc.dir
   POST_BUILD = :
