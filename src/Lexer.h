@@ -36,10 +36,19 @@ private:
 	// Debug
 	void debugTokenString();
 
-	std::string _source;
+	// Source file being lexed
+	std::string _source; 
+
+	// Stateful, current line
 	unsigned int _line;
+
+	// Position in source where we started to read from
 	unsigned int _start;
+
+	// Position in source where we are currently
 	unsigned int _current;
+
+	// List of tokens processed until now
 	std::vector<Token> _tokens;
 };
 

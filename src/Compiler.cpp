@@ -5,6 +5,7 @@
 #include <iostream>
 #include <fstream>
 
+// Read the file from source and compile it
 void Compiler::readFromFile(const std::string filePath) {
   std::ifstream file;
   file.open(filePath);
@@ -23,6 +24,7 @@ void Compiler::readFromFile(const std::string filePath) {
   this->run(buffer);
 }
 
+// Compile the file passed as source
 void Compiler::run(const std::string source) {
   Lexer lexer;
 

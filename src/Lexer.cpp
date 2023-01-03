@@ -16,6 +16,7 @@ void Lexer::scan(const std::string source) {
 
     auto c = advance();
     switch (c) {
+      // Single-character tokens
       case ';': { addToken(TokenType::SEMICOLON); break; }
       case '{': { addToken(TokenType::LEFT_BRACE); break; }
       case '}': { addToken(TokenType::RIGHT_BRACE); break; }
@@ -27,6 +28,7 @@ void Lexer::scan(const std::string source) {
       case '.': { addToken(TokenType::DOT); break; }
       case '^': { addToken(TokenType::BITWISE_XOR); break; }
       case '\\': { addToken(TokenType::BACK_SLASH); break; }
+      // Handling characters starting by + - * / -
       case '+': {
         if (peek() == '+') {
           advance();
@@ -85,6 +87,7 @@ void Lexer::scan(const std::string source) {
         addToken(TokenType::ASSIGN);
         break;
       }
+      // Handling = ! == !=
       case '=': {
         if (peek() == '=') {
           advance();
@@ -105,6 +108,7 @@ void Lexer::scan(const std::string source) {
         addToken(TokenType::BANG);
         break;
       }
+      // Handling & &&
       case '&': {
         if (peek() == '&') {
           advance();
@@ -115,6 +119,7 @@ void Lexer::scan(const std::string source) {
         addToken(TokenType::BITWISE_AND);
         break;
       }
+      // Handling | ||
       case '|': {
         if (peek() == '|') {
           advance();
@@ -125,10 +130,12 @@ void Lexer::scan(const std::string source) {
         addToken(TokenType::BITWISE_OR);
         break;
       }
+      // Preprocessor directives
       case '#': {
         preproc();
         break;
       }
+      // Handling Comparison + Bitwise < <= << <<=
       case '<': {
         if (isAlpha(peek())) {
           preprocInclude();
@@ -156,6 +163,7 @@ void Lexer::scan(const std::string source) {
         addToken(TokenType::LOWER);
         break;
       }      
+      // Handling Comparison + Bitwise > >= >> >>=
       case '>': {
         if (peek() == '=') {
           advance();
@@ -178,6 +186,7 @@ void Lexer::scan(const std::string source) {
         addToken(TokenType::GREATER);
         break;
       }
+      // Keywords & Identifiers
       case 'a': {
         keywordOrIdentifier("auto", TokenType::AUTO);
         break;
@@ -256,15 +265,18 @@ void Lexer::scan(const std::string source) {
         keywordOrIdentifier("while", TokenType::WHILE);
         break;
       }
+      // String literals
       case '"': {
         stringLiteral();
         break;
       }
       default: {
         if (isDigit(c)) {
+          // Number literals (integers & decimals)
           numberLiteral();
           break;
         } else if (isAlpha(c)) {
+          // Identifiers
           identifier();
           break;
         }
