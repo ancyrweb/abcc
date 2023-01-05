@@ -16,11 +16,13 @@ private:
 	void preproc();
 	void preprocInclude();
 	void keywordOrIdentifier(const std::string name, TokenType tokenType);
+	void keywordsOrIdentifier(std::string names[], TokenType tokenTypes[]);
 	void stringLiteral();
 	void numberLiteral();
 	void identifier();
 
 	// Utils
+	// TODO most of them can be turned into macros
 	void skipWhitespaces();
 	bool isAlpha(const char c);
 	bool isDigit(const char c);

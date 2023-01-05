@@ -12,6 +12,11 @@ void Lexer::scan(const std::string source) {
 
   while(!isAtEnd()) {
     skipWhitespaces();
+    if (isAtEnd()) {
+      // skipping whitespaces might lead us to the end of the file
+      break;
+    }
+
     _start = _current;
 
     auto c = advance();
@@ -196,10 +201,36 @@ void Lexer::scan(const std::string source) {
         break;
       }
       case 'c': {
-        
+         if (!isAtEnd()) {
+          if (peek() == 'h') {
+            keywordOrIdentifier("char", TokenType::CHAR);
+            break;
+          } else if (peek() == 'o' && peekAt(1) == 'n') {
+            if (peekAt(2) == 's') {
+              keywordOrIdentifier("const", TokenType::CONST);
+              break;
+            } else if (peekAt(2) == 't') {
+              keywordOrIdentifier("continue", TokenType::CONTINUE);
+              break;
+            }
+          } 
+        }
       }
       case 'd': {
+        if (!isAtEnd()) {
+          if (peek() == 'e') {
+            keywordOrIdentifier("default", TokenType::DEFAULT);
+            break;
+          } else if (peek() == 'o') {
+            if (peekAt(1) == 'u') {
+              keywordOrIdentifier("double", TokenType::DOUBLE);
+              break;
+            } 
 
+            keywordOrIdentifier("do", TokenType::CONTINUE);
+            break;
+          } 
+        }
       }
       case 'e': {
         if (!isAtEnd()) {
@@ -246,20 +277,74 @@ void Lexer::scan(const std::string source) {
         break;
       }
       case 'r': {
-        
+        if (!isAtEnd()) {
+          if (peek() == 'e') {
+            if (peekAt(1) == 'g') {
+              keywordOrIdentifier("register", TokenType::REGISTER);
+              break;
+            } else if (peekAt(1) == 't') {
+              keywordOrIdentifier("return", TokenType::RETURN);
+              break;
+            }
+          }   
+        }
       }
       case 's': {
-        
+        if (!isAtEnd()) {
+          if (peek() == 'i') {
+            if (peekAt(1) == 'g') {
+              keywordOrIdentifier("signed", TokenType::SIGNED);
+              break;
+            } else if (peekAt(1) == 'z') {
+              keywordOrIdentifier("sizeof", TokenType::SIZEOF);
+              break;
+            }
+          } else if (peek() == 't') {
+            if (peekAt(1) == 'a') {
+              keywordOrIdentifier("static", TokenType::STATIC);
+              break;
+            } else if (peekAt(1) == 'r') {
+              keywordOrIdentifier("struct", TokenType::STRUCT);
+              break;
+            }
+          } else if (peek() == 'w') {
+            keywordOrIdentifier("switch", TokenType::SWITCH);
+            break;
+          } else if (peek() == 'h') {
+            keywordOrIdentifier("short", TokenType::SHORT);
+            break;
+          }
+        }
       }
       case 't': {
         keywordOrIdentifier("typedef", TokenType::TYPEDEF);
         break;
       }
       case 'u': {
-        
+        if (!isAtEnd()) {
+          if (peek() == 'n') {
+            if (peekAt(1) == 'i') {
+              keywordOrIdentifier("union", TokenType::UNION);
+              break;
+            } else if (peekAt(1) == 's') {
+              keywordOrIdentifier("unsigned", TokenType::UNSIGNED);
+              break;
+            }
+          }
+        }
       }
       case 'v': {
-        
+        if (!isAtEnd()) {
+          if (peek() == 'o') {
+            if (peekAt(1) == 'i') {
+              keywordOrIdentifier("void", TokenType::VOID);
+              break;
+            } else if (peekAt(1) == 'l') {
+              keywordOrIdentifier("volatile", TokenType::VOLATILE);
+              break;
+            }
+          }
+        }
       }
       case 'w': {
         keywordOrIdentifier("while", TokenType::WHILE);
@@ -281,12 +366,12 @@ void Lexer::scan(const std::string source) {
           break;
         }
 
-        std::cout << "Unknown token " << c << "." << std::endl;
+        std::cout << "Unknown token code " << (int)c << " " << c << "." << std::endl;
       }
     }
   }
 
-  // debugTokens(_tokens);
+  debugTokens(_tokens);
 }
 
 void Lexer::preproc() {
@@ -331,6 +416,13 @@ void Lexer::keywordOrIdentifier(const std::string name, TokenType tokenType) {
     const char *targetStart = name.c_str();
 
     if (memcmp(sourceStart, targetStart, name.size()) == 0) {
+      if (isAlpha(peekAt(name.size() - 1))) {
+        // It starts like a keyword but it continues with an alpha
+        // something like returnV or shortTest should not be recognized
+        // as two different tokens but as a single identifier, so we skip.
+        return identifier();
+      }
+
       _current += name.size() - 1;
       this->addToken(tokenType);
       return;
@@ -406,6 +498,9 @@ void Lexer::skipWhitespaces() {
             // once we hit the \n, the scanner will re-start skipWhitespaces on the next line
             advance();
           }
+          continue;
+        } else if (peekNext() == '*') {
+          // TODO recognize multi-line comments
         }
       }
     }
@@ -415,7 +510,7 @@ void Lexer::skipWhitespaces() {
 }
 
 bool Lexer::isAlpha(const char c) {
-  return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
+  return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_';
 }
 
 bool Lexer::isDigit(const char c) {
@@ -440,6 +535,11 @@ char Lexer::peekNext() {
 }
 
 char Lexer::peekAt(unsigned int index) {
+  unsigned int at = _current + index;
+  if (at > _source.size()) {
+    return 0; // return null or any invalid character ?
+  }
+
   return _source.at(_current + index);
 }
 
